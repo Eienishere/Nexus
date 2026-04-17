@@ -1,0 +1,407 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Segoe UI Variable Display", sans-serif;
+  --font-mono: "Cascadia Code", ui-monospace, monospace;
+}
+
+/* ===== THEME SYSTEM — 13 Themes ===== */
+
+/* 1. Koyu (Dark) — Default */
+:root, [data-theme="dark"] {
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-glow: rgba(99, 102, 241, 0.2);
+  --background: #0a0a0a;
+  --surface: #171717;
+  --surface-hover: rgba(255, 255, 255, 0.05);
+  --card: #262626;
+  --border: rgba(255, 255, 255, 0.1);
+  --text-primary: #ffffff;
+  --text-secondary: #a3a3a3;
+  --text-muted: #737373;
+  --accent: #f43f5e;
+  --glass-bg: rgba(23, 23, 23, 0.7);
+  --scrollbar: #333;
+  --scrollbar-hover: #444;
+  --today-highlight: rgba(99, 102, 241, 0.08);
+  --shadow: rgba(0, 0, 0, 0.4);
+  color-scheme: dark;
+}
+
+/* 2. Açık (Light) */
+[data-theme="light"] {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-glow: rgba(79, 70, 229, 0.12);
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --surface-hover: rgba(0, 0, 0, 0.03);
+  --card: #f1f5f9;
+  --border: rgba(0, 0, 0, 0.08);
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --accent: #e11d48;
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --scrollbar: #cbd5e1;
+  --scrollbar-hover: #94a3b8;
+  --today-highlight: rgba(79, 70, 229, 0.08);
+  --shadow: rgba(0, 0, 0, 0.08);
+  color-scheme: light;
+}
+
+/* 3. Gece Mavisi (Night Blue) */
+[data-theme="night-blue"] {
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-glow: rgba(59, 130, 246, 0.2);
+  --background: #0c1222;
+  --surface: #141d2f;
+  --surface-hover: rgba(255, 255, 255, 0.04);
+  --card: #1c2940;
+  --border: rgba(59, 130, 246, 0.12);
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent: #06b6d4;
+  --glass-bg: rgba(20, 29, 47, 0.8);
+  --scrollbar: #1e3a5f;
+  --scrollbar-hover: #2563eb;
+  --today-highlight: rgba(59, 130, 246, 0.1);
+  --shadow: rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+/* 4. Mor Gradient (Purple) */
+[data-theme="purple"] {
+  --primary: #a855f7;
+  --primary-hover: #9333ea;
+  --primary-glow: rgba(168, 85, 247, 0.2);
+  --background: #0f0720;
+  --surface: #1a0f2e;
+  --surface-hover: rgba(255, 255, 255, 0.04);
+  --card: #2d1b4e;
+  --border: rgba(168, 85, 247, 0.12);
+  --text-primary: #f3e8ff;
+  --text-secondary: #c4b5fd;
+  --text-muted: #7c3aed;
+  --accent: #ec4899;
+  --glass-bg: rgba(26, 15, 46, 0.8);
+  --scrollbar: #3b1d6e;
+  --scrollbar-hover: #a855f7;
+  --today-highlight: rgba(168, 85, 247, 0.1);
+  --shadow: rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+/* 5. Yeşil Orman (Forest) */
+[data-theme="forest"] {
+  --primary: #22c55e;
+  --primary-hover: #16a34a;
+  --primary-glow: rgba(34, 197, 94, 0.2);
+  --background: #071208;
+  --surface: #0f1f12;
+  --surface-hover: rgba(255, 255, 255, 0.04);
+  --card: #1a3320;
+  --border: rgba(34, 197, 94, 0.12);
+  --text-primary: #ecfdf5;
+  --text-secondary: #86efac;
+  --text-muted: #4ade80;
+  --accent: #eab308;
+  --glass-bg: rgba(15, 31, 18, 0.8);
+  --scrollbar: #14532d;
+  --scrollbar-hover: #22c55e;
+  --today-highlight: rgba(34, 197, 94, 0.1);
+  --shadow: rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+/* 6. Midnight Aurora */
+[data-theme="midnight-aurora"] {
+  --primary: #8b5cf6;
+  --primary-hover: #7c3aed;
+  --primary-glow: rgba(139, 92, 246, 0.2);
+  --background: #050714;
+  --surface: #0c0f24;
+  --surface-hover: rgba(139, 92, 246, 0.06);
+  --card: #141836;
+  --border: rgba(139, 92, 246, 0.12);
+  --text-primary: #e0e7ff;
+  --text-secondary: #a5b4fc;
+  --text-muted: #6366f1;
+  --accent: #34d399;
+  --glass-bg: rgba(12, 15, 36, 0.85);
+  --scrollbar: #1e1b4b;
+  --scrollbar-hover: #8b5cf6;
+  --today-highlight: rgba(139, 92, 246, 0.1);
+  --shadow: rgba(5, 7, 20, 0.6);
+  color-scheme: dark;
+}
+
+/* 7. Arctic Frost */
+[data-theme="arctic-frost"] {
+  --primary: #0ea5e9;
+  --primary-hover: #0284c7;
+  --primary-glow: rgba(14, 165, 233, 0.1);
+  --background: #f0f9ff;
+  --surface: #ffffff;
+  --surface-hover: rgba(14, 165, 233, 0.04);
+  --card: #e0f2fe;
+  --border: rgba(14, 165, 233, 0.12);
+  --text-primary: #0c4a6e;
+  --text-secondary: #0369a1;
+  --text-muted: #7dd3fc;
+  --accent: #0891b2;
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --scrollbar: #bae6fd;
+  --scrollbar-hover: #0ea5e9;
+  --today-highlight: rgba(14, 165, 233, 0.08);
+  --shadow: rgba(14, 165, 233, 0.06);
+  color-scheme: light;
+}
+
+/* 8. Sunset Ember */
+[data-theme="sunset-ember"] {
+  --primary: #f97316;
+  --primary-hover: #ea580c;
+  --primary-glow: rgba(249, 115, 22, 0.2);
+  --background: #0c0806;
+  --surface: #1a110c;
+  --surface-hover: rgba(249, 115, 22, 0.06);
+  --card: #2a1a10;
+  --border: rgba(249, 115, 22, 0.12);
+  --text-primary: #fef3c7;
+  --text-secondary: #fdba74;
+  --text-muted: #c2410c;
+  --accent: #ef4444;
+  --glass-bg: rgba(26, 17, 12, 0.85);
+  --scrollbar: #7c2d12;
+  --scrollbar-hover: #f97316;
+  --today-highlight: rgba(249, 115, 22, 0.1);
+  --shadow: rgba(12, 8, 6, 0.6);
+  color-scheme: dark;
+}
+
+/* 9. Forest Dusk */
+[data-theme="forest-dusk"] {
+  --primary: #84cc16;
+  --primary-hover: #65a30d;
+  --primary-glow: rgba(132, 204, 22, 0.15);
+  --background: #0a0f07;
+  --surface: #151e0e;
+  --surface-hover: rgba(132, 204, 22, 0.05);
+  --card: #1f2e16;
+  --border: rgba(132, 204, 22, 0.1);
+  --text-primary: #ecfccb;
+  --text-secondary: #bef264;
+  --text-muted: #4d7c0f;
+  --accent: #a3e635;
+  --glass-bg: rgba(21, 30, 14, 0.85);
+  --scrollbar: #365314;
+  --scrollbar-hover: #84cc16;
+  --today-highlight: rgba(132, 204, 22, 0.08);
+  --shadow: rgba(10, 15, 7, 0.6);
+  color-scheme: dark;
+}
+
+/* 10. Rose Quartz */
+[data-theme="rose-quartz"] {
+  --primary: #ec4899;
+  --primary-hover: #db2777;
+  --primary-glow: rgba(236, 72, 153, 0.1);
+  --background: #fdf2f8;
+  --surface: #ffffff;
+  --surface-hover: rgba(236, 72, 153, 0.04);
+  --card: #fce7f3;
+  --border: rgba(236, 72, 153, 0.12);
+  --text-primary: #831843;
+  --text-secondary: #be185d;
+  --text-muted: #f9a8d4;
+  --accent: #f43f5e;
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --scrollbar: #fbcfe8;
+  --scrollbar-hover: #ec4899;
+  --today-highlight: rgba(236, 72, 153, 0.08);
+  --shadow: rgba(236, 72, 153, 0.06);
+  color-scheme: light;
+}
+
+/* 11. Neon Noir */
+[data-theme="neon-noir"] {
+  --primary: #22d3ee;
+  --primary-hover: #06b6d4;
+  --primary-glow: rgba(34, 211, 238, 0.15);
+  --background: #030712;
+  --surface: #0a0f1a;
+  --surface-hover: rgba(34, 211, 238, 0.05);
+  --card: #111827;
+  --border: rgba(34, 211, 238, 0.1);
+  --text-primary: #ecfeff;
+  --text-secondary: #67e8f9;
+  --text-muted: #0e7490;
+  --accent: #4ade80;
+  --glass-bg: rgba(10, 15, 26, 0.85);
+  --scrollbar: #164e63;
+  --scrollbar-hover: #22d3ee;
+  --today-highlight: rgba(34, 211, 238, 0.08);
+  --shadow: rgba(3, 7, 18, 0.7);
+  color-scheme: dark;
+}
+
+/* 12. Slate Pro */
+[data-theme="slate-pro"] {
+  --primary: #94a3b8;
+  --primary-hover: #64748b;
+  --primary-glow: rgba(148, 163, 184, 0.12);
+  --background: #0f172a;
+  --surface: #1e293b;
+  --surface-hover: rgba(255, 255, 255, 0.04);
+  --card: #334155;
+  --border: rgba(148, 163, 184, 0.1);
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #475569;
+  --accent: #e2e8f0;
+  --glass-bg: rgba(30, 41, 59, 0.8);
+  --scrollbar: #334155;
+  --scrollbar-hover: #94a3b8;
+  --today-highlight: rgba(148, 163, 184, 0.08);
+  --shadow: rgba(15, 23, 42, 0.5);
+  color-scheme: dark;
+}
+
+/* 13. Golden Hour */
+[data-theme="golden-hour"] {
+  --primary: #f59e0b;
+  --primary-hover: #d97706;
+  --primary-glow: rgba(245, 158, 11, 0.15);
+  --background: #070b18;
+  --surface: #0f1629;
+  --surface-hover: rgba(245, 158, 11, 0.05);
+  --card: #1a2340;
+  --border: rgba(245, 158, 11, 0.1);
+  --text-primary: #fefce8;
+  --text-secondary: #fde68a;
+  --text-muted: #b45309;
+  --accent: #fbbf24;
+  --glass-bg: rgba(15, 22, 41, 0.85);
+  --scrollbar: #78350f;
+  --scrollbar-hover: #f59e0b;
+  --today-highlight: rgba(245, 158, 11, 0.08);
+  --shadow: rgba(7, 11, 24, 0.6);
+  color-scheme: dark;
+}
+
+/* 14. Özel Tema (Custom) — User-defined, values set dynamically via JS on :root */
+[data-theme="custom"] {
+  --primary: var(--custom-primary, #6366f1);
+  --primary-hover: var(--custom-primary-hover, #4f46e5);
+  --primary-glow: var(--custom-primary-glow, rgba(99, 102, 241, 0.2));
+  --background: var(--custom-bg, #0a0a0a);
+  --surface: var(--custom-surface, #171717);
+  --surface-hover: rgba(255, 255, 255, 0.05);
+  --card: var(--custom-card, #262626);
+  --border: rgba(255, 255, 255, 0.1);
+  --text-primary: var(--custom-text, #ffffff);
+  --text-secondary: #a3a3a3;
+  --text-muted: #737373;
+  --accent: var(--custom-accent, #f43f5e);
+  --glass-bg: var(--custom-glass, rgba(23, 23, 23, 0.7));
+  --scrollbar: #333;
+  --scrollbar-hover: var(--custom-primary, #6366f1);
+  --today-highlight: var(--custom-primary-glow, rgba(99, 102, 241, 0.08));
+  --shadow: rgba(0, 0, 0, 0.4);
+  color-scheme: dark;
+}
+
+/* ===== BASE STYLES ===== */
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.sidebar-item-active {
+  background: linear-gradient(90deg, var(--primary-glow) 0%, transparent 100%);
+  border-left: 3px solid var(--primary);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+
+/* ===== Markdown Prose ===== */
+.prose {
+  line-height: 1.8;
+  color: var(--text-primary);
+  max-width: none;
+}
+.prose h1 { font-size: 2rem; font-weight: 800; margin: 1.5rem 0 1rem; color: var(--text-primary); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+.prose h2 { font-size: 1.5rem; font-weight: 700; margin: 1.25rem 0 0.75rem; color: var(--text-primary); }
+.prose h3 { font-size: 1.25rem; font-weight: 600; margin: 1rem 0 0.5rem; }
+.prose h4 { font-size: 1.1rem; font-weight: 600; margin: 0.75rem 0 0.5rem; color: var(--text-secondary); }
+.prose p { margin: 0.75rem 0; }
+.prose a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+.prose a:hover { opacity: 0.8; }
+.prose strong { font-weight: 700; color: var(--text-primary); }
+.prose em { font-style: italic; color: var(--text-secondary); }
+.prose blockquote { border-left: 3px solid var(--primary); padding: 0.5rem 1rem; margin: 1rem 0; background: var(--primary-glow); border-radius: 0 0.5rem 0.5rem 0; color: var(--text-secondary); }
+.prose ul { list-style: disc; padding-left: 1.5rem; margin: 0.5rem 0; }
+.prose ol { list-style: decimal; padding-left: 1.5rem; margin: 0.5rem 0; }
+.prose li { margin: 0.25rem 0; }
+.prose code { background: var(--surface-hover); padding: 0.15rem 0.4rem; border-radius: 0.375rem; font-size: 0.875em; font-family: var(--font-mono); color: var(--accent); }
+.prose pre { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+.prose pre code { background: transparent; padding: 0; color: var(--text-primary); }
+.prose hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+.prose table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.prose th { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 2px solid var(--border); font-weight: 700; color: var(--text-primary); }
+.prose td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); }
+.prose img { border-radius: 0.75rem; max-width: 100%; margin: 1rem 0; }
+.prose del { text-decoration: line-through; color: var(--text-muted); }
+
+/* Light theme overrides for Tailwind utility classes */
+[data-theme="light"] .bg-white\/5,
+[data-theme="arctic-frost"] .bg-white\/5,
+[data-theme="rose-quartz"] .bg-white\/5 { background-color: rgba(0, 0, 0, 0.03); }
+
+[data-theme="light"] .bg-white\/10,
+[data-theme="arctic-frost"] .bg-white\/10,
+[data-theme="rose-quartz"] .bg-white\/10 { background-color: rgba(0, 0, 0, 0.05); }
+
+[data-theme="light"] .border-white\/5,
+[data-theme="arctic-frost"] .border-white\/5,
+[data-theme="rose-quartz"] .border-white\/5 { border-color: rgba(0, 0, 0, 0.05); }
+
+[data-theme="light"] .border-white\/10,
+[data-theme="arctic-frost"] .border-white\/10,
+[data-theme="rose-quartz"] .border-white\/10 { border-color: rgba(0, 0, 0, 0.08); }
+
+[data-theme="light"] .hover\:bg-white\/5:hover,
+[data-theme="arctic-frost"] .hover\:bg-white\/5:hover,
+[data-theme="rose-quartz"] .hover\:bg-white\/5:hover { background-color: rgba(0, 0, 0, 0.03); }
+
+[data-theme="light"] .hover\:bg-white\/10:hover,
+[data-theme="arctic-frost"] .hover\:bg-white\/10:hover,
+[data-theme="rose-quartz"] .hover\:bg-white\/10:hover { background-color: rgba(0, 0, 0, 0.06); }
+
+[data-theme="light"] .text-neutral-400,
+[data-theme="arctic-frost"] .text-neutral-400,
+[data-theme="rose-quartz"] .text-neutral-400 { color: var(--text-secondary); }
+
+[data-theme="light"] .text-neutral-500,
+[data-theme="arctic-frost"] .text-neutral-500,
+[data-theme="rose-quartz"] .text-neutral-500 { color: var(--text-muted); }

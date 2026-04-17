@@ -1,0 +1,8 @@
+{
+  "name": "NEXUS Productivity Suite",
+  "description": "A professional-grade productivity ecosystem featuring Task Management, Pomodoro, Calendar, and AI-driven insights.",
+  "requestFramePermissions": [
+    "notifications",
+    "geolocation"
+  ]
+}
