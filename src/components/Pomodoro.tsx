@@ -67,8 +67,7 @@ export default function Pomodoro() {
     <div className="h-full w-full flex flex-col items-center justify-center space-y-6 sm:space-y-10 px-2 sm:px-4">
       <div className="text-center space-y-2">
         <h2 className="text-2xl sm:text-4xl font-display font-bold tracking-tight">{t('Pomo_Title')}</h2>
-        <p className="text-neutral-500">Pomodoro tekniği ile odaklanın ve üretken kalın.</p>
-      </div>
+        </div>
 
       {/* Mode Switcher */}
       <div className="flex flex-wrap justify-center gap-1 bg-white/5 p-1.5 rounded-2xl border border-white/10 w-full max-w-2xl">

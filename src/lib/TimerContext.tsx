@@ -4,6 +4,7 @@ import { api } from './api';
 import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import TimerWorker from './timerWorker?worker';
 
 type PomodoroMode = 'Work' | 'ShortBreak' | 'LongBreak';
 
@@ -51,6 +52,9 @@ interface TimerContextState {
   pipWindow: Window | null;
   openPip: (w: 'pomodoro' | 'countdown' | 'stopwatch' | 'localclock') => void;
   closePip: () => void;
+
+  // Local clock tick (saniye) — PiP'te saat güncellemesi için
+  clockSecond: number;
 }
 
 const TimerContext = createContext<TimerContextState | null>(null);
@@ -86,6 +90,39 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   const cdLastTickRef = useRef<number | null>(null);
   const swStartPerfRef = useRef<number | null>(null);
   const swAccumulatedMsRef = useRef(0);
+
+  // Web Worker — tarayıcı arka plan throttling'inden muaf tick kaynağı
+  const workerRef = useRef<Worker | null>(null);
+  // Tick callback ref'leri — Worker sadece aktif olan fonksiyonları çağırır
+  const pomoTickFnRef = useRef<(() => void) | null>(null);
+  const cdTickFnRef = useRef<(() => void) | null>(null);
+  const swTickFnRef = useRef<(() => void) | null>(null);
+  const clockTickFnRef = useRef<(() => void) | null>(null);
+
+  // Local clock PiP için saniye güncelleme state'i
+  const [clockSecond, setClockSecond] = useState(0);
+
+  useEffect(() => {
+    const worker = new TimerWorker();
+    workerRef.current = worker;
+
+    worker.onmessage = () => {
+      // Sadece aktif timer'ların tick fonksiyonlarını çağır
+      pomoTickFnRef.current?.();
+      cdTickFnRef.current?.();
+      swTickFnRef.current?.();
+      clockTickFnRef.current?.();
+    };
+
+    worker.postMessage({ command: 'start', intervalMs: 50 });
+
+    return () => {
+      worker.postMessage({ command: 'stop' });
+      worker.terminate();
+      workerRef.current = null;
+    };
+  }, []);
+
   useEffect(() => {
     pipWindowRef.current = pipWindow;
   }, [pipWindow]);
@@ -129,19 +166,17 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   const updateAlarm = async (id: string, updates: any) => { await api.updateAlarm(id, updates); await loadAlarms(); };
   const deleteAlarm = async (id: string) => { await api.deleteAlarm(id); await loadAlarms(); };
 
+  // Pomodoro tick — Worker her 50ms'de çağırır
   useEffect(() => {
     if (!pomoActive) {
       pomoLastTickRef.current = null;
+      pomoTickFnRef.current = null;
       return;
     }
 
-    if (pomoTimeLeft <= 0) {
-      setPomoActive(false);
-      handlePomoComplete();
-      return;
-    }
+    pomoLastTickRef.current = Date.now();
 
-    const tick = () => {
+    pomoTickFnRef.current = () => {
       const now = Date.now();
       if (pomoLastTickRef.current === null) {
         pomoLastTickRef.current = now;
@@ -156,6 +191,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
         const next = prev - elapsedSeconds;
         if (next <= 0) {
           setPomoActive(false);
+          pomoTickFnRef.current = null;
           handlePomoComplete();
           return 0;
         }
@@ -163,23 +199,20 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
       });
     };
 
-    const interval = setInterval(tick, 100);
-    return () => clearInterval(interval);
-  }, [pomoActive, pomoTimeLeft]);
+    return () => { pomoTickFnRef.current = null; };
+  }, [pomoActive]);
 
+  // Countdown tick — Worker her 50ms'de çağırır
   useEffect(() => {
     if (!cdActive) {
       cdLastTickRef.current = null;
+      cdTickFnRef.current = null;
       return;
     }
 
-    if (cdTimeLeft <= 0) {
-      setCdActive(false);
-      triggerAlarm('countdown', 'Geri Sayım Tamamlandı!');
-      return;
-    }
+    cdLastTickRef.current = Date.now();
 
-    const tick = () => {
+    cdTickFnRef.current = () => {
       const now = Date.now();
       if (cdLastTickRef.current === null) {
         cdLastTickRef.current = now;
@@ -194,6 +227,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
         const next = prev - elapsedSeconds;
         if (next <= 0) {
           setCdActive(false);
+          cdTickFnRef.current = null;
           triggerAlarm('countdown', 'Geri Sayım Tamamlandı!');
           return 0;
         }
@@ -201,31 +235,50 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
       });
     };
 
-    const interval = setInterval(tick, 100);
-    return () => clearInterval(interval);
-  }, [cdActive, cdTimeLeft]);
+    return () => { cdTickFnRef.current = null; };
+  }, [cdActive]);
 
+  // Stopwatch tick — Worker her 50ms'de çağırır
   useEffect(() => {
     if (!swActive) {
       if (swStartPerfRef.current !== null) {
         swAccumulatedMsRef.current += performance.now() - swStartPerfRef.current;
         swStartPerfRef.current = null;
       }
+      swTickFnRef.current = null;
       return;
     }
 
     swStartPerfRef.current = performance.now();
 
-    const tick = () => {
+    swTickFnRef.current = () => {
       const now = performance.now();
       const activeElapsed = swStartPerfRef.current ? now - swStartPerfRef.current : 0;
       setSwTime(Math.floor(swAccumulatedMsRef.current + activeElapsed));
     };
 
-    const intervalMs = document.visibilityState === 'visible' ? 33 : 100;
-    const interval = setInterval(tick, intervalMs);
-    return () => clearInterval(interval);
+    return () => { swTickFnRef.current = null; };
   }, [swActive]);
+
+  // Local clock PiP tick — sadece localclock PiP açıkken saniye günceller
+  useEffect(() => {
+    if (activePipWidget !== 'localclock') {
+      clockTickFnRef.current = null;
+      return;
+    }
+
+    let lastSecond = new Date().getSeconds();
+    clockTickFnRef.current = () => {
+      const now = new Date();
+      const sec = now.getSeconds();
+      if (sec !== lastSecond) {
+        lastSecond = sec;
+        setClockSecond(sec);
+      }
+    };
+
+    return () => { clockTickFnRef.current = null; };
+  }, [activePipWidget]);
 
   // General Background Interval for Clock Alarms
   useEffect(() => {
@@ -392,7 +445,8 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
       activePipWidget, setPipWidget,
       pipWindow,
       openPip,
-      closePip
+      closePip,
+      clockSecond
     }}>
       {children}
     </TimerContext.Provider>

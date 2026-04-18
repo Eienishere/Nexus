@@ -120,7 +120,9 @@ export default function PopoutWindow({
       winRef.current = null;
       setContainer(null);
     };
-  }, [featureStr, isOpen, targetWindow, title]);
+  // Not: `title` buraya eklenmez — title değiştiğinde pencere yeniden oluşturulmamalı.
+  // Title güncellemesi ayrı bir effect ile yapılır (satır 68-72).
+  }, [featureStr, isOpen, targetWindow]);
 
   if (!isOpen || !container) return null;
 

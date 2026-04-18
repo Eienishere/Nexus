@@ -17,7 +17,7 @@ export default function FloatingWidget() {
     pomoActive, pomoTimeLeft, pomoMode, togglePomo, resetPomo,
     cdActive, cdTimeLeft, pauseCountdown, resetCountdown,
     swActive, swTime, toggleStopwatch, resetStopwatch,
-    activePipWidget, pipWindow, closePip
+    activePipWidget, pipWindow, closePip, clockSecond
   } = useTimer();
 
   // Determine which timer to show.
