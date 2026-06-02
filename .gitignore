@@ -1,0 +1,83 @@
+# =============================================================================
+# Nexus - Safe Git Ignore
+# Keep repository clean: source code only.
+# =============================================================================
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+.pnp.cjs
+
+# Build outputs / caches
+dist/
+build/
+out/
+client/dist/
+client/.vite/
+.vite/
+coverage/
+*.tsbuildinfo
+build_output.txt
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Databases / local encrypted materials
+nexus.db
+nexus.db-wal
+nexus.db-shm
+nexus.db-journal
+nexus_salt.bin
+nexus_autologin.bin
+*.db
+*.sqlite
+*.sqlite3
+
+# Backups / archives
+backups/
+*.backup
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# Keys / certs / credentials
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+credentials.json
+secrets.json
+service-account*.json
+
+# Logs / temp
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.tmp
+*.temp
+
+# IDE / OS
+.idea/
+.vscode/
+.cursor/
+.DS_Store
+.DS_Store?
+Thumbs.db
+desktop.ini
+
+# Local scripts / scratch
+check_task.cjs
+nexus-react/
+
