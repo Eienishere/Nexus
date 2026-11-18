@@ -83,6 +83,20 @@ const tr: Record<string, string> = {
   Cal_NoDayEvents: "Bu güne ait etkinlik yok.",
   Cal_NoDayPlanned: "Bugün için planlanmış etkinlik yok.",
   Cal_UpcomingTitle: "Yaklaşan Etkinlikler",
+  Cal_Import: "İçe Aktar",
+  Cal_Export: "Dışa Aktar",
+  Cal_ImportTitle: "Takvim İçe Aktar",
+  Cal_ImportDesc: ".ics dosyası yükleyin veya içeriği yapıştırın",
+  Cal_ImportPaste: "ICS İçeriğini Yapıştırın",
+  Cal_ImportFile: "Dosya Yükle",
+  Cal_ImportPreview: "Önizleme",
+  Cal_ImportAll: "Hepsini Aktar",
+  Cal_ImportSuccess: "etkinlik başarıyla aktarıldı!",
+  Cal_ImportError: "Geçersiz ICS formatı",
+  Cal_ImportViewMismatch: "Görünüm Uyumsuzluğu",
+  Cal_ExportSuccess: "Takvim dışa aktarıldı",
+  Cal_EventsFound: "etkinlik bulundu",
+  Cal_ImportConfirm: "Yine de aktarmak istiyor musunuz?",
 
   // POMODORO
   Pomo_Title: "Pomodoro Zamanlayıcı",
@@ -122,6 +136,10 @@ const tr: Record<string, string> = {
   Countdown_Title: "Geri Sayım",
   Countdown_Subtitle: "Belirlediğiniz tarih ve saate yerel zamana göre geri sayar.",
   Countdown_New: "Yeni geri sayım",
+  Countdown_AddNew: "Yeni Geri Sayım Ekle",
+  Countdown_SavedList: "Kaydedilenler",
+  Countdown_NoCountdowns: "Henüz kaydedilmiş geri sayım yok.",
+  Countdown_ActiveBadge: "Aktif",
   Countdown_LabelPlaceholder: "Başlık (ör. Sınav, Tatil)",
   Countdown_LabelRequired: "Lütfen bir başlık girin.",
   Countdown_DefaultLabel: "Geri sayım",
@@ -205,6 +223,7 @@ const tr: Record<string, string> = {
   Theme_NeonNoir: "Neon Noir",
   Theme_SlatePro: "Slate Pro",
   Theme_GoldenHour: "Altın Saat",
+  Theme_LiquidGlass: "Liquid Glass",
 };
 
 const en: Record<string, string> = {
@@ -292,6 +311,20 @@ const en: Record<string, string> = {
   Cal_NoDayEvents: "No events for this day.",
   Cal_NoDayPlanned: "No events planned for today.",
   Cal_UpcomingTitle: "Upcoming Events",
+  Cal_Import: "Import",
+  Cal_Export: "Export",
+  Cal_ImportTitle: "Import Calendar",
+  Cal_ImportDesc: "Upload .ics file or paste content",
+  Cal_ImportPaste: "Paste ICS Content",
+  Cal_ImportFile: "Upload File",
+  Cal_ImportPreview: "Preview",
+  Cal_ImportAll: "Import All",
+  Cal_ImportSuccess: "events imported successfully!",
+  Cal_ImportError: "Invalid ICS format",
+  Cal_ImportViewMismatch: "View Mismatch",
+  Cal_ExportSuccess: "Calendar exported",
+  Cal_EventsFound: "events found",
+  Cal_ImportConfirm: "Import anyway?",
 
   // POMODORO
   Pomo_Title: "Pomodoro Timer",
@@ -331,6 +364,10 @@ const en: Record<string, string> = {
   Countdown_Title: "Countdown",
   Countdown_Subtitle: "Counts down to your chosen date and time in local time.",
   Countdown_New: "New countdown",
+  Countdown_AddNew: "Add New Countdown",
+  Countdown_SavedList: "Saved Countdowns",
+  Countdown_NoCountdowns: "No saved countdowns yet.",
+  Countdown_ActiveBadge: "Active",
   Countdown_LabelPlaceholder: "Title (e.g. Exam, Vacation)",
   Countdown_LabelRequired: "Please enter a title.",
   Countdown_DefaultLabel: "Countdown",
@@ -414,6 +451,7 @@ const en: Record<string, string> = {
   Theme_NeonNoir: "Neon Noir",
   Theme_SlatePro: "Slate Pro",
   Theme_GoldenHour: "Golden Hour",
+  Theme_LiquidGlass: "Liquid Glass",
 };
 
 const dictionaries: Record<string, Record<string, string>> = { tr, en };

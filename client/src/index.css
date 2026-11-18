@@ -6,7 +6,7 @@
   --font-mono: "Cascadia Code", ui-monospace, monospace;
 }
 
-/* ===== THEME SYSTEM — 13 Themes ===== */
+/* ===== THEME SYSTEM — 15 Themes ===== */
 
 /* 1. Koyu (Dark) — Default */
 :root, [data-theme="dark"] {
@@ -294,7 +294,40 @@
   color-scheme: dark;
 }
 
-/* 14. Özel Tema (Custom) — User-defined, values set dynamically via JS on :root */
+/* 15. Liquid Glass */
+[data-theme="liquid-glass"] {
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-glow: rgba(99, 102, 241, 0.25);
+  --background: #0a0a0f;
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-hover: rgba(255, 255, 255, 0.08);
+  --card: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.12);
+  --text-primary: #f0f0f5;
+  --text-secondary: #a0a0b0;
+  --text-muted: #606070;
+  --accent: #ec4899;
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --scrollbar: rgba(255, 255, 255, 0.1);
+  --scrollbar-hover: rgba(99, 102, 241, 0.5);
+  --today-highlight: rgba(99, 102, 241, 0.1);
+  --shadow: rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+
+  /* Liquid Glass specific tokens */
+  --lg-blur: 16px;
+  --lg-saturation: 1.4;
+  --lg-surface-bg: rgba(255, 255, 255, 0.06);
+  --lg-surface-border: rgba(255, 255, 255, 0.15);
+  --lg-highlight-top: rgba(255, 255, 255, 0.12);
+  --lg-highlight-bottom: rgba(255, 255, 255, 0.02);
+  --lg-shadow-outer: 0 8px 32px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
+  --lg-shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --lg-radius: 1.25rem;
+}
+
+/* 15. Özel Tema (Custom) — User-defined, values set dynamically via JS on :root */
 [data-theme="custom"] {
   --primary: var(--custom-primary, #6366f1);
   --primary-hover: var(--custom-primary-hover, #4f46e5);

@@ -77,9 +77,15 @@ lerna-debug.log*
 Thumbs.db
 desktop.ini
 
-# Local scripts / scratch
+# Local scripts / scratch / launchers
 check_task.cjs
 nexus-react/
+NexusLauncher.cs
+start.bat
+*.exe
+*.dll
+*.pdb
+*.bin
 
 # Private local module: Prayer/Ezan feature (sana özel, GitHub'a gitmez)
 client/src/components/PrayerTimes.tsx

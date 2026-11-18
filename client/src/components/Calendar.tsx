@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   ChevronLeft, ChevronRight, Plus, 
-  MoreHorizontal, Clock, MapPin, Users, Trash2, Edit2, Tag
+  MoreHorizontal, Clock, MapPin, Users, Trash2, Edit2, Tag,
+  Download, Upload, FileUp, ClipboardPaste, AlertTriangle, CheckCircle2, X,
+  RotateCcw
 } from 'lucide-react';
+import Schedule from './Schedule';
 import { 
   format, addMonths, subMonths, startOfMonth, 
   endOfMonth, startOfWeek, endOfWeek, isSameMonth, 
@@ -12,11 +15,13 @@ import { tr } from 'date-fns/locale';
 import { cn } from '../lib/utils';
 import { t, getLang } from '../lib/i18n';
 import { api } from '../lib/api';
+import { parseICS, generateICS, validateViewType, viewToNexusType, type ParsedEvent, type NexusViewType } from '../lib/icsParser';
 
 export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [view, setView] = useState('Month');
+  const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [newEventTitle, setNewEventTitle] = useState('');
@@ -28,6 +33,16 @@ export default function Calendar() {
   const [agendaFilter, setAgendaFilter] = useState<'upcoming' | 'past'>('upcoming');
   const [isAgendaMinimized, setIsAgendaMinimized] = useState(true);
   const [isWeekTimeline, setIsWeekTimeline] = useState(false);
+
+  // ICS Import/Export state
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const [importMode, setImportMode] = useState<'paste' | 'file'>('paste');
+  const [importText, setImportText] = useState('');
+  const [importPreview, setImportPreview] = useState<ParsedEvent[] | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importWarning, setImportWarning] = useState<string | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const weekStartsOn = (parseInt(localStorage.getItem('nexus-weekstart') || '1') as 0 | 1);
 
@@ -210,6 +225,135 @@ export default function Calendar() {
     }
   };
 
+  // ── ICS Import Handlers ──────────────────────────────────────────────────
+  const handleImportParse = (text: string) => {
+    setImportText(text);
+    setImportError(null);
+    setImportWarning(null);
+    setImportPreview(null);
+
+    if (!text.trim()) return;
+
+    const result = parseICS(text);
+    if (!result.success) {
+      setImportError((result as { success: false; error: string }).error);
+      return;
+    }
+
+    setImportPreview(result.events);
+
+    // View-type validation warning
+    const warning = validateViewType(result.viewType, view);
+    if (warning) {
+      setImportWarning(warning);
+    }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const content = ev.target?.result as string;
+      setImportMode('paste');
+      handleImportParse(content);
+    };
+    reader.readAsText(file);
+    // Reset so same file can be selected again
+    e.target.value = '';
+  };
+
+  const handleImportAll = async () => {
+    if (!importPreview || importPreview.length === 0) return;
+    setIsImporting(true);
+    try {
+      for (const evt of importPreview) {
+        const dueDate = evt.isAllDay
+          ? `${format(evt.dtstart, 'yyyy-MM-dd')}T00:00:00.000Z`
+          : evt.dtstart.toISOString();
+        const dueEndDate = evt.dtend && !evt.isAllDay
+          ? evt.dtend.toISOString()
+          : evt.dtend && evt.isAllDay
+          ? undefined
+          : undefined;
+
+        await api.createTask({
+          id: crypto.randomUUID(),
+          title: evt.summary,
+          description: evt.description || undefined,
+          due_date: dueDate,
+          due_end_date: dueEndDate || undefined,
+          is_all_day: evt.isAllDay,
+          priority: 'Medium',
+          status: 'Todo',
+        });
+      }
+      // Close modal and refresh
+      setIsImportOpen(false);
+      setImportText('');
+      setImportPreview(null);
+      setImportError(null);
+      setImportWarning(null);
+      fetchTasks();
+      // Show success via sonner (imported from App level via Toaster)
+      const event = new CustomEvent('nexus-toast', { detail: { type: 'success', message: `${importPreview.length} ${t('Cal_ImportSuccess')}` } });
+      window.dispatchEvent(event);
+    } catch (err) {
+      console.error('ICS import failed:', err);
+      setImportError('Aktarım sırasında bir hata oluştu.');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handleExport = () => {
+    const viewType = viewToNexusType(view);
+
+    // Determine which events to export based on view
+    let exportEvents: typeof events;
+    if (view === 'Day') {
+      exportEvents = events.filter(e => isSameDay(e.date, selectedDate));
+    } else if (view === 'Week') {
+      const wStart = startOfWeek(selectedDate, { weekStartsOn });
+      const wEnd = endOfWeek(selectedDate, { weekStartsOn });
+      exportEvents = events.filter(e => e.date >= wStart && e.date <= wEnd);
+    } else {
+      // Month & Agenda → export current month
+      const mStart = startOfMonth(currentDate);
+      const mEnd = endOfMonth(currentDate);
+      exportEvents = events.filter(e => e.date >= mStart && e.date <= mEnd);
+    }
+
+    const icsContent = generateICS(
+      exportEvents.map(e => ({
+        title: e.title,
+        date: e.date,
+        endDate: e.endDate,
+        is_all_day: e.is_all_day,
+      })),
+      viewType
+    );
+
+    // Download as .ics file
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `nexus-takvim-${format(new Date(), 'yyyy-MM-dd')}.ics`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const closeImportModal = () => {
+    setIsImportOpen(false);
+    setImportText('');
+    setImportPreview(null);
+    setImportError(null);
+    setImportWarning(null);
+  };
+
   return (
     <div className="flex flex-col h-full space-y-6">
       <div className="flex items-center justify-between">
@@ -233,7 +377,7 @@ export default function Calendar() {
             </button>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           {view === 'Week' && (
             <button
               onClick={() => setIsWeekTimeline(v => !v)}
@@ -267,10 +411,47 @@ export default function Calendar() {
               </button>
             ))}
           </div>
+          {/* ICS Import / Export buttons */}
+          <div className="flex items-center gap-1.5 bg-white/5 p-1 rounded-lg border border-white/10">
+            <button
+              onClick={() => { setIsImportOpen(true); setImportMode('paste'); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-emerald-400 hover:bg-emerald-500/10 transition-all"
+              title={t('Cal_Import')}
+            >
+              <Download size={16} />
+              <span className="hidden sm:inline">{t('Cal_Import')}</span>
+            </button>
+            <div className="w-px h-5 bg-white/10" />
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-sky-400 hover:bg-sky-500/10 transition-all"
+              title={t('Cal_Export')}
+            >
+              <Upload size={16} />
+              <span className="hidden sm:inline">{t('Cal_Export')}</span>
+            </button>
+          </div>
           <button onClick={() => openCreateEventModal(selectedDate)} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-lg shadow-indigo-500/20 transition-all">
             <Plus size={18} />
             <span>{t('Cal_NewEvent')}</span>
           </button>
+          {/* Program / Haftalık Şablon butonu */}
+          <button
+            onClick={() => setIsScheduleOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg shadow-lg shadow-violet-500/20 transition-all"
+            title="Haftalık sabit programı görüntüle"
+          >
+            <RotateCcw size={18} />
+            <span>Program</span>
+          </button>
+          {/* Hidden file input for .ics upload */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".ics,text/calendar"
+            className="hidden"
+            onChange={handleFileUpload}
+          />
         </div>
       </div>
 
@@ -956,6 +1137,172 @@ export default function Calendar() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Schedule (Haftalık Program) Modal ────────────────────────────── */}
+      {isScheduleOpen && (
+        <Schedule onClose={() => setIsScheduleOpen(false)} />
+      )}
+
+      {/* ── ICS Import Modal ─────────────────────────────────────────────── */}
+      {isImportOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-lg glass-panel rounded-3xl border border-white/10 shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 pb-4 border-b border-white/5">
+              <div>
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  <Download size={20} className="text-emerald-400" />
+                  {t('Cal_ImportTitle')}
+                </h3>
+                <p className="text-sm text-neutral-500 mt-1">{t('Cal_ImportDesc')}</p>
+              </div>
+              <button
+                onClick={closeImportModal}
+                className="p-2 hover:bg-white/10 rounded-xl transition-colors text-neutral-400 hover:text-white"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Mode tabs */}
+            <div className="flex gap-2 px-6 pt-4">
+              <button
+                onClick={() => setImportMode('paste')}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all",
+                  importMode === 'paste'
+                    ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30"
+                    : "bg-white/5 text-neutral-400 hover:text-white border border-white/10"
+                )}
+              >
+                <ClipboardPaste size={16} />
+                {t('Cal_ImportPaste')}
+              </button>
+              <button
+                onClick={() => { setImportMode('file'); fileInputRef.current?.click(); }}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all",
+                  importMode === 'file'
+                    ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30"
+                    : "bg-white/5 text-neutral-400 hover:text-white border border-white/10"
+                )}
+              >
+                <FileUp size={16} />
+                {t('Cal_ImportFile')}
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {/* Textarea */}
+              <textarea
+                value={importText}
+                onChange={(e) => handleImportParse(e.target.value)}
+                placeholder={`BEGIN:VCALENDAR\nVERSION:2.0\n...`}
+                className="w-full h-40 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-sm font-mono resize-none focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all placeholder:text-neutral-600"
+                spellCheck={false}
+              />
+
+              {/* Error */}
+              {importError && (
+                <div className="flex items-start gap-3 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20">
+                  <AlertTriangle size={18} className="text-rose-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-bold text-rose-400">{t('Cal_ImportError')}</p>
+                    <p className="text-xs text-rose-300/80 mt-1">{importError}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Warning (view mismatch) */}
+              {importWarning && !importError && (
+                <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                  <AlertTriangle size={18} className="text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-bold text-amber-400">{t('Cal_ImportViewMismatch')}</p>
+                    <p className="text-xs text-amber-300/80 mt-1">{importWarning}</p>
+                    <p className="text-xs text-amber-300/60 mt-0.5">{t('Cal_ImportConfirm')}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Preview */}
+              {importPreview && importPreview.length > 0 && !importError && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-bold text-neutral-400 flex items-center gap-2">
+                    <CheckCircle2 size={16} className="text-emerald-400" />
+                    {t('Cal_ImportPreview')} — {importPreview.length} {t('Cal_EventsFound')}
+                  </h4>
+                  <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1 no-scrollbar">
+                    {importPreview.map((evt, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/[0.07] transition-colors"
+                      >
+                        <div className="w-1 h-8 rounded-full bg-emerald-500 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold truncate">{evt.summary}</p>
+                          <p className="text-[11px] text-neutral-500">
+                            {evt.isAllDay ? (
+                              format(evt.dtstart, 'dd.MM.yyyy') + ' · Tüm Gün'
+                            ) : (
+                              <>
+                                {format(evt.dtstart, 'dd.MM.yyyy HH:mm')}
+                                {evt.dtend ? ` – ${format(evt.dtend, 'HH:mm')}` : ''}
+                              </>
+                            )}
+                          </p>
+                          {evt.description && (
+                            <p className="text-[10px] text-neutral-600 truncate mt-0.5">{evt.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="flex gap-2 p-6 pt-4 border-t border-white/5">
+              <button
+                onClick={closeImportModal}
+                className="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors font-medium"
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleImportAll}
+                disabled={!importPreview || importPreview.length === 0 || isImporting}
+                className={cn(
+                  "flex-1 px-4 py-3 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2",
+                  importPreview && importPreview.length > 0 && !isImporting
+                    ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20"
+                    : "bg-white/5 text-neutral-600 cursor-not-allowed"
+                )}
+              >
+                {isImporting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Aktarılıyor...
+                  </>
+                ) : (
+                  <>
+                    <Download size={16} />
+                    {t('Cal_ImportAll')}
+                    {importPreview && importPreview.length > 0 && (
+                      <span className="bg-white/20 px-1.5 py-0.5 rounded-md text-xs">{importPreview.length}</span>
+                    )}
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

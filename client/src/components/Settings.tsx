@@ -24,6 +24,7 @@ const THEMES = [
   { id: 'neon-noir', label: 'Theme_NeonNoir', bg: '#030712', primary: '#22d3ee', accent: '#4ade80' },
   { id: 'slate-pro', label: 'Theme_SlatePro', bg: '#0f172a', primary: '#94a3b8', accent: '#e2e8f0' },
   { id: 'golden-hour', label: 'Theme_GoldenHour', bg: '#070b18', primary: '#f59e0b', accent: '#fbbf24' },
+  { id: 'liquid-glass', label: 'Theme_LiquidGlass', bg: '#0a0a0f', primary: '#6366f1', accent: '#ec4899' },
   { id: 'custom', label: 'Özel Tema', bg: '#0a0a0a', primary: '#6366f1', accent: '#f43f5e' },
 ];
 
