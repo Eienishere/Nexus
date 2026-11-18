@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { 
   LayoutDashboard, CheckSquare, Calendar as CalendarIcon, Clock, 
   Timer as TimerIcon, Hourglass, Zap, StickyNote,
-  Settings as SettingsIcon, Lock, Menu
+  Settings as SettingsIcon, Lock, Menu, MoonStar
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
@@ -20,9 +20,16 @@ import TimerModule from './components/TimerModule';
 import Countdown from './components/Countdown';
 import Notes from './components/Notes';
 import Settings from './components/Settings';
+// Private module: Prayer (conditionally loaded — gitignored)
+const prayerModules = import.meta.glob('./components/PrayerTimes.tsx');
+const PRAYER_AVAILABLE = Object.keys(prayerModules).length > 0;
+const PrayerTimes = PRAYER_AVAILABLE
+  ? lazy(() => import('./components/PrayerTimes'))
+  : null;
 import QuickAddModal from './components/QuickAddModal';
 import OnboardingModal from './components/OnboardingModal';
 import GlobalNotificationOverlay from './components/GlobalNotificationOverlay';
+
 import FloatingWidget from './components/FloatingWidget';
 import LockScreen from './components/LockScreen';
 
@@ -101,6 +108,7 @@ export default function App() {
     { path: '/pomodoro',  icon: TimerIcon,       label: t('Nav_Pomodoro') },
     { path: '/countdown', icon: Hourglass,       label: t('Nav_Countdown') },
     { path: '/clock',     icon: Clock,           label: t('Nav_Clock') },
+    ...(PRAYER_AVAILABLE ? [{ path: '/prayer', icon: MoonStar, label: t('Nav_Prayer') }] : []),
     { path: '/notes',     icon: StickyNote,      label: t('Nav_Notes') },
     { path: '/settings',  icon: SettingsIcon,    label: t('Nav_Settings') },
   ];
@@ -116,6 +124,7 @@ export default function App() {
       <div className="dynamic-bg" />
       <Toaster position="top-right" theme={theme === 'light' ? 'light' : 'dark'} />
       <GlobalNotificationOverlay />
+
       <FloatingWidget />
 
       {/* Sidebar - Collapsible */}
@@ -291,6 +300,13 @@ export default function App() {
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/countdown" element={<Countdown />} />
               <Route path="/clock" element={<TimerModule />} />
+              {PRAYER_AVAILABLE && PrayerTimes && (
+                <Route path="/prayer" element={
+                  <Suspense fallback={<div className="flex items-center justify-center h-full text-neutral-500">Yükleniyor...</div>}>
+                    <PrayerTimes />
+                  </Suspense>
+                } />
+              )}
               <Route path="/notes/*" element={<Notes />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="*" element={

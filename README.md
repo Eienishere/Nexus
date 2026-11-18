@@ -168,3 +168,7 @@ npm run test:watch # Vitest watch mode
 - DB migration ihtiyaci varsa `server/db.ts` icindeki migration bolumunu guncelleyin
 
 ---
+
+## License
+
+Bu repo private/proprietary kullanim odakli gorunuyor. Gerekiyorsa buraya acik bir lisans (MIT, Apache-2.0 vb.) eklenebilir.

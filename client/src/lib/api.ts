@@ -108,6 +108,23 @@ export const api = {
     return res.json();
   },
 
+  // Prayer times
+  getPrayerTimes: async (city: string, country = 'Turkey') => {
+    const params = new URLSearchParams({ city, country });
+    const res = await fetch(`${API_BASE}/prayer/timings?${params.toString()}`);
+    if (!res.ok) {
+      let detail = '';
+      try {
+        const payload = await res.json();
+        detail = payload?.error ? `: ${payload.error}` : '';
+      } catch {
+        // no-op
+      }
+      throw new Error(`Failed to fetch prayer times (${res.status})${detail}`);
+    }
+    return res.json();
+  },
+
   // Alarms
   getAlarms: async () => {
     const res = await fetch(`${API_BASE}/alarms`);

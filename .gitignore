@@ -81,3 +81,7 @@ desktop.ini
 check_task.cjs
 nexus-react/
 
+# Private local module: Prayer/Ezan feature (sana özel, GitHub'a gitmez)
+client/src/components/PrayerTimes.tsx
+client/src/components/GlobalPrayerReminder.tsx
+server/routes/prayer.ts

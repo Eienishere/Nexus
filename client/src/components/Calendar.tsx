@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   ChevronLeft, ChevronRight, Plus, 
-  MoreHorizontal, Clock, MapPin, Users, Trash2, Edit2
+  MoreHorizontal, Clock, MapPin, Users, Trash2, Edit2, Tag
 } from 'lucide-react';
 import { 
   format, addMonths, subMonths, startOfMonth, 
@@ -119,7 +119,8 @@ export default function Calendar() {
     date: new Date(task.due_date),
     endDate: task.due_end_date ? new Date(task.due_end_date) : null,
     color: task.priority === 'Critical' ? 'bg-rose-500' : task.priority === 'High' ? 'bg-amber-500' : 'bg-indigo-500',
-    is_all_day: task.is_all_day
+    is_all_day: task.is_all_day,
+    tags: Array.isArray(task.tags) ? task.tags : [],
   }));
   const weekDays = eachDayOfInterval({
     start: startOfWeek(selectedDate, { weekStartsOn }),
@@ -313,6 +314,11 @@ export default function Calendar() {
                           className={cn("px-2 py-0.5 rounded text-[10px] font-bold text-white truncate", event.color)}
                         >
                           {event.title}
+                          {event.tags?.length > 0 && (
+                            <span className="ml-1 text-[9px] text-white/90">
+                              #{event.tags[0].name}
+                            </span>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -356,6 +362,19 @@ export default function Calendar() {
                                 <><Clock size={10}/> {format(e.date, 'HH:mm')}{e.endDate ? ` - ${format(e.endDate, 'HH:mm')}` : ''}</>
                               )}
                             </div>
+                            {e.tags?.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {e.tags.slice(0, 2).map((tag: any) => (
+                                  <span
+                                    key={tag.id}
+                                    className="px-1.5 py-0.5 rounded text-[9px] font-bold text-white/95 border border-white/30"
+                                    style={{ backgroundColor: tag.color }}
+                                  >
+                                    {tag.name}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -496,6 +515,19 @@ export default function Calendar() {
                                 <div className="text-[10px] text-white/80 mt-auto">
                                   {format(e.date, 'HH:mm')}{e.endDate ? ` - ${format(e.endDate, 'HH:mm')}` : ''}
                                 </div>
+                                {e.tags?.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {e.tags.slice(0, 2).map((tag: any) => (
+                                      <span
+                                        key={tag.id}
+                                        className="px-1 py-0.5 rounded text-[9px] font-bold text-white/95 border border-white/30"
+                                        style={{ backgroundColor: tag.color }}
+                                      >
+                                        {tag.name}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -686,6 +718,19 @@ export default function Calendar() {
                         <div className="text-[11px] font-medium text-white/80 mt-auto pt-1">
                           {format(e.date, 'HH:mm')}{e.endDate ? ` - ${format(e.endDate, 'HH:mm')}` : ''}
                         </div>
+                        {e.tags?.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {e.tags.slice(0, 2).map((tag: any) => (
+                              <span
+                                key={tag.id}
+                                className="px-1.5 py-0.5 rounded text-[9px] font-bold text-white/95 border border-white/30"
+                                style={{ backgroundColor: tag.color }}
+                              >
+                                {tag.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ));
                   })()}
@@ -732,6 +777,20 @@ export default function Calendar() {
                   <div className="flex-1">
                     <h4 className="font-bold text-lg">{e.title}</h4>
                     <p className="text-xs text-neutral-500">{format(e.date, 'HH:mm')}{e.endDate ? ` - ${format(e.endDate, 'HH:mm')}` : ''} · {format(e.date, 'EEEE', { locale: tr })}</p>
+                    {e.tags?.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {e.tags.map((tag: any) => (
+                          <span
+                            key={tag.id}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold text-white"
+                            style={{ backgroundColor: tag.color }}
+                          >
+                            <Tag size={10} />
+                            {tag.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button onClick={() => openEditEventModal(e)} className="text-neutral-500 hover:text-indigo-400 transition-opacity p-2">
@@ -806,6 +865,19 @@ export default function Calendar() {
                         <><Clock size={12} /> {format(e.date, 'HH:mm')}{e.endDate ? ` - ${format(e.endDate, 'HH:mm')}` : ''}</>
                       )}
                     </div>
+                    {e.tags?.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {e.tags.map((tag: any) => (
+                          <span
+                            key={tag.id}
+                            className="px-2 py-0.5 rounded text-[10px] font-bold text-white border border-white/30"
+                            style={{ backgroundColor: tag.color }}
+                          >
+                            {tag.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

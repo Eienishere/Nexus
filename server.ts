@@ -31,6 +31,7 @@ import settingsRouter from "./server/routes/settings.js";
 import statsRouter from "./server/routes/stats.js";
 import backupsRouter, { startAutoBackupScheduler } from "./server/routes/backups.js";
 
+
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -85,6 +86,15 @@ async function startServer() {
   app.use("/api/settings", settingsRouter);
   app.use("/api/stats",    statsRouter);
   app.use("/api/backups",  backupsRouter);
+
+  // ─── PRIVATE MODULE: Prayer (conditionally loaded) ───────────────────────
+  try {
+    const prayerModule = await import("./server/routes/prayer.js");
+    app.use("/api/prayer", prayerModule.default);
+    console.log("[Prayer] Prayer module loaded.");
+  } catch {
+    // Prayer module not available (gitignored private feature) — skip silently
+  }
 
   // ─── AUTO-BACKUP SCHEDULER ────────────────────────────────────────────────
   startAutoBackupScheduler();
